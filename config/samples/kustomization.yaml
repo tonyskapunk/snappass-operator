@@ -1,0 +1,4 @@
+## Append samples you want in your CSV to this file as resources ##
+resources:
+- snappass_v1alpha1_snappass.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
