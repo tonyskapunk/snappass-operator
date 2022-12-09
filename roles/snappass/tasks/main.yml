@@ -23,7 +23,22 @@
                 ports:
                   - containerPort: "{{ redis_port }}"
 
-#TODO: redis and snappass svc
+- name: Redis svc
+  kubernetes.core.k8s:
+    definition:
+      kind: Service
+      apiVersion: v1
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-redis-svc"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        type: ClusterIP
+        ports:
+          - port: 16379
+            protocol: TCP
+            targetPort: "{{ redis_port }}"
+        selector:
+          app: snappass
 
 - name: Snap Pass deploy
   kubernetes.core.k8s:
@@ -48,11 +63,29 @@
                 image: "{{ lookup('env', 'RELATED_IMAGE_SNAPPASS') | default(snappass_image) }}"
                 env:
                   - name: REDIS_URL
-                    value: "redis://{{ ansible_operator_meta.name}}-redis-snappass:{{ redis_port }}"
+                    value: "redis://{{ ansible_operator_meta.name}}-redis-svc:16379"
                   - name: NO_SSL
                     value: ok
                 ports:
                   - containerPort: "{{ snappass_port }}"
+
+- name: SnapPass svc
+  kubernetes.core.k8s:
+    definition:
+      kind: Service
+      apiVersion: v1
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-snappass-svc"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        type: ClusterIP
+        ports:
+          - port: 15000
+            protocol: TCP
+            targetPort: "{{ snappass_port }}"
+        selector:
+          app: snappass
+
 #- name: SnapPass all-in-one
 #  kubernetes.core.k8s:
 #    definition:
@@ -80,7 +113,7 @@
 #                image: "{{ snappass_image }}"
 #                env:
 #                  - name: REDIS_URL
-#                    value: "redis://{{  }}:{{ redis_port }}"
+#                    value: "redis://localhost:{{ redis_port }}"
 #                  - name: NO_SSL
 #                    value: ok
 #                ports:
