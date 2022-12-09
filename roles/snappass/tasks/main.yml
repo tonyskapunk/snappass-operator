@@ -1,2 +1,88 @@
 ---
-# tasks file for SnapPass
+- name: Redis deploy
+  kubernetes.core.k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-redis-snappass"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        replicas: "{{ redis_size }}"
+        selector:
+          matchLabels:
+            app: snappass
+        template:
+          metadata:
+            labels:
+              app: snappass
+          spec:
+            containers:
+              - name: redis
+                image: "{{ lookup('env', 'RELATED_IMAGE_REDIS') | default(redis_image) }}"
+                ports:
+                  - containerPort: "{{ redis_port }}"
+
+#TODO: redis and snappass svc
+
+- name: Snap Pass deploy
+  kubernetes.core.k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-snappass"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: snappass
+        template:
+          metadata:
+            labels:
+              app: snappass
+          spec:
+            containers:
+              - name: snappass
+                image: "{{ lookup('env', 'RELATED_IMAGE_SNAPPASS') | default(snappass_image) }}"
+                env:
+                  - name: REDIS_URL
+                    value: "redis://{{ ansible_operator_meta.name}}-redis-snappass:{{ redis_port }}"
+                  - name: NO_SSL
+                    value: ok
+                ports:
+                  - containerPort: "{{ snappass_port }}"
+#- name: SnapPass all-in-one
+#  kubernetes.core.k8s:
+#    definition:
+#      kind: Deployment
+#      apiVersion: apps/v1
+#      metadata:
+#        name: "{{ ansible_operator_meta.name }}-snappass"
+#        namespace: "{{ ansible_operator_meta.namespace }}"
+#      spec:
+#        replicas: 1
+#        selector:
+#          matchLabels:
+#            app: snappass
+#        template:
+#          metadata:
+#            labels:
+#              app: snappass
+#          spec:
+#            containers:
+#              - name: redis
+#                image: "{{ redis_image }}"
+#                ports:
+#                  - containerPort: "{{ redis_port }}"
+#              - name: snappass
+#                image: "{{ snappass_image }}"
+#                env:
+#                  - name: REDIS_URL
+#                    value: "redis://{{  }}:{{ redis_port }}"
+#                  - name: NO_SSL
+#                    value: ok
+#                ports:
+#                  - containerPort: "{{ snappass_port }}"
+#

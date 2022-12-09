@@ -9,4 +9,11 @@ metadata:
     app.kubernetes.io/created-by: snappass-operator
   name: snappass-sample
 spec:
-  # TODO(user): Add fields here
+  redisSize: 2
+  ## spec vars are translated into snake_case (unless snakeCaseParameters is set to false in watches.yml)
+  ## This is one way to override the images used by the controller.
+  ## Another way is to define these images in the deployment
+  # redisImage: "registry.example.com/org/redis:latest"
+  # redisPort: 1234
+  # snappassImage: "registry.example.com/org/snappass:latest"
+  # snappassPort: 4321

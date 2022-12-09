@@ -74,6 +74,10 @@ spec:
         env:
         - name: ANSIBLE_GATHERING
           value: explicit
+        - name: RELATED_IMAGE_REDIS
+          value: "mirror.gcr.io/library/redis:latest"
+        - name: RELATED_IMAGE_SNAPPASS
+          value: "quay.io/tonyskapunk/snappass:latest"
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

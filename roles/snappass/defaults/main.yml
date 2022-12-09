@@ -1,2 +1,15 @@
 ---
-# defaults file for SnapPass
+redis_size: 1
+## Variables can be passed through the CR definition.
+## For example:
+## | CR manifest | Ansible     |
+## | ----------- | ----------- |
+## | redisImage  | redis_image |
+##
+## It may be harder to track this way, because for disconnected environments,
+## it can't be infered from the CSV that someone could use different images,
+## or that these images need to be mirrored
+redis_image: "mirror.gcr.io/library/redis:latest"
+snappass_image: "quay.io/tonyskapunk/snappass:latest"
+redis_port: 6379
+snappass_port: 5000
