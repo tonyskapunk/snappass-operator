@@ -19,7 +19,7 @@
           spec:
             containers:
               - name: redis
-                image: "{{ lookup('env', 'RELATED_IMAGE_REDIS') | default(redis_image) }}"
+                image: "{{ lookup('env', 'RELATED_IMAGE_REDIS') | default(redis_image, true) }}"
                 ports:
                   - containerPort: "{{ redis_port }}"
 
@@ -60,7 +60,7 @@
           spec:
             containers:
               - name: snappass
-                image: "{{ lookup('env', 'RELATED_IMAGE_SNAPPASS') | default(snappass_image) }}"
+                image: "{{ lookup('env', 'RELATED_IMAGE_SNAPPASS') | default(snappass_image, true) }}"
                 env:
                   - name: REDIS_URL
                     value: "redis://{{ ansible_operator_meta.name}}-redis-svc:16379"
