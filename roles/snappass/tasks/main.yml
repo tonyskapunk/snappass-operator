@@ -80,11 +80,31 @@
       spec:
         type: ClusterIP
         ports:
-          - port: 15000
+          - port: 5000
             protocol: TCP
             targetPort: "{{ snappass_port }}"
         selector:
           app: snappass
+
+- name: SnapPass Route
+  kubernetes.core.k8s:
+    definition:
+
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: "sp"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: snappass
+      spec:
+        port:
+          targetPort: 5000
+        to:
+          kind: Service
+          name: "{{ ansible_operator_meta.name }}-snappass-svc"
+          weight: 100
+        wildcardPolicy: None
 
 #- name: SnapPass all-in-one
 #  kubernetes.core.k8s:
